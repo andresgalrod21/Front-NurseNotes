@@ -102,6 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
             grP_ID: parseInt(document.getElementById("user-grp-id").value),
         };
 
+        console.log("Datos enviados al backend:", userData); // Log de los datos enviados
+
         fetch("https://nursenotes.somee.com/apiUsers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -109,17 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Error al crear el usuario");
+                    return response.json().then((errorData) => {
+                        console.error("Error en la respuesta del servidor:", errorData);
+                        throw new Error("Error al crear el usuario");
+                    });
                 }
                 return response.json();
             })
-            .then(() => {
+            .then((data) => {
+                console.log("Usuario creado con éxito:", data); // Log de éxito
                 loadUsers();
                 userCreateForm.reset();
             })
             .catch((error) => console.error("Error en la creación del usuario:", error));
     });
-
     // Buscar Usuario por ID
     searchUserBtn.addEventListener("click", () => {
         const usR_ID = document.getElementById("search-user-id").value;
