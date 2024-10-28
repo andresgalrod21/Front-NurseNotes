@@ -20,7 +20,7 @@
                 };
 
                 // Realiza la solicitud fetch a la API del backend
-                fetch('https://localhost:7299/api/Auth/login', { // Usa http o https según el backend
+                fetch('https://nursenotes.somee.com/api/Auth/login', { // Usa http o https según el backend
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -32,9 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (usersSection) usersSection.style.display = "none";
         if (scoreSection) scoreSection.style.display = "none";
 
-
-
-
         logsSection.style.display = "none";
     }
     // Evento para mostrar solo la sección de logs

@@ -86,21 +86,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // Crear Permiso por Grupo
     permissionGroupCreateForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+       
         // Obtener los valores de los inputs (sin crear registros en otras tablas)
         const grP_ID = parseInt(document.getElementById("permission-group-grp-id").value);
-        const peR_ID = parseInt(document.getElementById("permission-group-per-id").value);
-
+        const peR_ID =parseInt(document.getElementById("permission-group-per-id").value);
+         // Reemplaza con los datos correctos
+       
+ 
         // Validar que solo se estén enviando IDs
         if (isNaN(grP_ID) || isNaN(peR_ID)) {
             alert("Por favor ingrese valores de ID válidos para Grupo y Permiso.");
             return;
         }
-
+       
+ 
         // Crear el objeto de datos para la solicitud
-        const permissionGroupData = { grP_ID: grP_ID, peR_ID: peR_ID };
-        console.log("Enviando IDs a la API:", permissionGroupData);
-
+        const permissionGroupData = {
+            pG_ID: 0,
+            grP_ID: grP_ID,
+            peR_ID: peR_ID,
+            groups: {
+                grP_ID: 0,
+                grpdsc: ""
+            },
+            permitions: {
+                peR_ID: 0,
+                perdsc: ""
+            }
+        };
+        console.log("Enviando IDs local a la API:", permissionGroupData);
+ 
         fetch('https://nursenotes.somee.com/apiPerXGroups', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

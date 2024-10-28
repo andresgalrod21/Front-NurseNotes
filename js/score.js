@@ -26,13 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (medicationsSection) medicationsSection.style.display = "none";
         if (permissionsGroupsSection) permissionsGroupsSection.style.display = "none";
         if (permissionsSection) permissionsSection.style.display = "none";
-        if (staffSection) staffSection.style.display = "none";
-        if (tipdocsSection) tipdocsSection.style.display = "none";
+        if (specialitiesSection) specialitiesSection.style.display = "none";
         if (usersSection) usersSection.style.display = "none";
         if (logsSection) logsSection.style.display = "none";
-
-
-
 
         scoreSection.style.display = "none";
     }
@@ -47,8 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Función para cargar Puntajes de Jugadores
     function loadScores() {
         fetch("https://nursenotes.somee.com/apiScores")
-            .then((response) => response.json())
+            .then((response) => {
+                console.log("Response status:", response.status); // Log para estado de respuesta
+                return response.json();
+            })
             .then((data) => {
+                console.log("Data received:", data); // Log para ver los datos
                 scoreTable.innerHTML = ""; // Limpiar tabla
                 data.forEach((score) => {
                     const row = scoreTable.insertRow();
