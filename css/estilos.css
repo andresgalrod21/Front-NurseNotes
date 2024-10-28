@@ -23,7 +23,6 @@ body{
     top: 3%;
 }
 
-
 .hero {
     width: 100%;
     height: 100vh;
@@ -49,13 +48,12 @@ body{
     z-index: -1;
 }
 
-
 .nav{
     --padding-container:0;
 }
 
 #login-section {
-    position: absolute; /* Para ubicarlo en un punto específico de la página */
+    position: absolute;
     right: 10%; /* Ubica el formulario a la derecha */
     top: 60%; /* Ubica el formulario un poco más abajo de la mitad de la pantalla */
     transform: translateY(-50%); /* Centra verticalmente el formulario con respecto a su punto superior */
@@ -160,63 +158,180 @@ body{
 }
 
 /*----------------------------------------*/
-
-#diagnosticos {
-    position: absolute; /* Permite posicionarlo de forma libre en la pantalla */
-    top: 45%; /* Centrar verticalmente */
-    left: 60%; /* Mover ligeramente hacia la izquierda (60% del borde izquierdo) */
-    transform: translate(-60%, -50%); /* Asegura que esté centrado horizontal y verticalmente */
+#diagnosticos, #groups, #headquarters, #incomes, #medications, #permissions-groups,
+#permissions, #specialities, #staff, #tipdocs, #users, #logs, #score {
+    position: absolute;
+    top: 45%;
+    left: 60%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    width: 20%; /* Ocupa un 20% del ancho de la pantalla */
-    padding: 20px;
-    background-color: #f9f9f9; /* Color de fondo */
-    border-radius: 5px; /* Bordes redondeados */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Efecto de sombra */
+    width: 28%; /* Reducido al 80% de 35% */
+    padding: 16px; /* Reducido al 80% de 20px */
+    background-color: #f9f9f9;
+    border-radius: 4px; /* Ajustado para mantener proporción */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Sombra ligeramente reducida */
     color: black;
+    font-size: 0.8em; /* Reducido al 80% del tamaño de fuente */
 }
 
 #diagnosis-create-form,
 #read-section,
-#update-section {
-    margin-bottom: 20px; /* Espacio entre secciones */
-    width: 100%; /* Asegura que los elementos internos ocupen el 100% del contenedor */
+#update-section,
+#group-create-form,
+#group-read-section,
+#group-update-section {
+    margin-bottom: 16px;
+    width: 100%; 
 }
 
- h3 {
-    margin-bottom: 10px; 
-} 
+h3 {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
 
 label {
-    display: block; /* Etiquetas ocupando el ancho completo */
-    margin-bottom: 5px;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
 }
 
 input[type="text"],
 input[type="number"] {
     width: 100%;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
 }
 
 button {
     background-color: #28a745;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
+    border-radius: 4px;
+    padding: 8px 12px;
     cursor: pointer;
+    font-size: 0.9em;
 }
 
 button:hover {
     background-color: #218838;
 }
 
-#read-output {
-    margin-top: 20px;
+#search-output, #group-search-output {
+    margin-top: 16px;
+}
+
+/*------------------ Formulario de Usuario en Dos Columnas ----------------*/
+
+/* Contenedor de formularios en dos columnas */
+#user-form-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 80%; /* Reduce el ancho del contenedor en un 20% */
+    margin: 0 auto; /* Centra el contenedor */
+}
+
+#user-create-form,
+#user-update-form {
+    width: 48%; /* Ajusta para mantener el diseño de dos columnas */
+    padding: 14px; /* Reduce ligeramente el padding para adaptarse al tamaño */
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+#users {
+    position: absolute;
+    top: 45%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    width: 45%; /* Reduce el ancho de la sección en general */
+    padding: 16px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    color: black;
+    font-size: 0.8em;
+}
+
+#users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+#users-table th,
+#users-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.action-btn {
+    margin-top: 8px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.action-btn:hover {
+    background-color: #218838;
 }
 
 
+/* Sección de búsqueda y lista */
+#user-search-list-container {
+    width: 100%;
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
 
+#user-search-list-container h3 {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+#user-search-list-container input[type="number"],
+#user-search-list-container button {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+}
+
+#user-search-list-container button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#user-search-list-container button:hover {
+    background-color: #218838;
+}
+
+#user-search-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+#user-search-list-container th,
+#user-search-list-container td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
