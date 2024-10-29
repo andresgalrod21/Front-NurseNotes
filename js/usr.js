@@ -10,10 +10,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const usersSection = document.getElementById("users");
     const usersBtn = document.getElementById("usr-btn");
 
+    // Función para codificar en Base64
+    function encodeBase64(str) {
+        return btoa(str);
+    }
+
+    // Función para obtener la fecha y hora actual en formato ISO
+    function getCurrentDateTimeISO() {
+        return new Date().toISOString();
+    }
+
     // Función para ocultar todas las secciones
     function hideAllSections() {
-        // Ocultar todas las secciones adicionales
-        usersSection.style.display = "none";
+        const sections = [
+            "diagnosticos", "groups", "folios", "headquarters", "incomes", "medications",
+            "permissions-groups", "permissions", "staff", "tipdocs", "logs", "score", "users"
+        ];
+        sections.forEach(id => {
+            const section = document.getElementById(id);
+            if (section) section.style.display = "none";
+        });
     }
 
     // Evento para mostrar solo la sección de usuarios
@@ -26,8 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Función para cargar Usuarios
     function loadUsers() {
         fetch("https://nursenotes.somee.com/apiUsers")
-            .then((response) => response.json())
-            .then((data) => {
+            .then(response => response.json())
+            .then(data => {
                 usersTable.innerHTML = "";
                 updateUserIDSelect.innerHTML = "";
                 data.forEach((user) => {
@@ -43,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${user.group ? user.group.grpdsc : ''}</td>
                         <td><button onclick="confirmRemoveUserRow(this)">Eliminar</button></td>
                     `;
+
                     const option = document.createElement("option");
                     option.value = user.usR_ID;
                     option.textContent = `${user.usR_ID} - ${user.name} ${user.lastname}`;
@@ -63,49 +80,51 @@ document.addEventListener("DOMContentLoaded", () => {
     userCreateForm.addEventListener("submit", (e) => {
         e.preventDefault();
 
+        const name = document.getElementById("user-name").value;
+        const lastname = document.getElementById("user-lastname").value;
+        const tipdoc = document.getElementById("user-tipdoc").value;
+        const numdoc = parseInt(document.getElementById("user-numdoc").value);
+        const usrpsw = document.getElementById("user-usrpsw").value; // Cifra en Base64
+        const usr = document.getElementById("user-usr").value;
+        const grP_ID = parseInt(document.getElementById("user-grp-id").value);
+        const fchcreation = getCurrentDateTimeISO(); // Fecha y hora actual en ISO
+
         const userData = {
             usR_ID: 0,
-            name: document.getElementById("user-name").value,
-            lastname: document.getElementById("user-lastname").value,
-            tipdoc: document.getElementById("user-tipdoc").value,
-            numdoc: parseInt(document.getElementById("user-numdoc").value),
-            usrpsw: document.getElementById("user-usrpsw").value,
-            usr: document.getElementById("user-usr").value,
-            fchcreation: "0001-01-01T00:00:00", // Fecha de creación en formato default
-            grP_ID: parseInt(document.getElementById("user-grp-id").value),
+            name: name,
+            lastname: lastname,
+            tipdoc: tipdoc,
+            numdoc: numdoc,
+            usrpsw: usrpsw,
+            usr: usr,
+            fchcreation: fchcreation,
+            grP_ID: grP_ID,
             group: {
                 grP_ID: 0,
                 grpdsc: ""
             }
         };
 
-        console.log("Datos enviados al backend:", userData);
-
         fetch("https://nursenotes.somee.com/apiUsers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
-                    return response.json().then((errorData) => {
+                    return response.json().then(errorData => {
                         console.error("Error en la respuesta del servidor:", errorData);
-                        if (errorData.errors) {
-                            for (const [field, messages] of Object.entries(errorData.errors)) {
-                                console.error(`Error en el campo ${field}: ${messages.join(", ")}`);
-                            }
-                        }
                         throw new Error("Error al crear el usuario");
                     });
                 }
                 return response.json();
             })
-            .then((data) => {
+            .then(data => {
                 console.log("Usuario creado con éxito:", data);
                 loadUsers();
                 userCreateForm.reset();
             })
-            .catch((error) => console.error("Error en la creación del usuario:", error));
+            .catch(error => console.error("Error en la creación del usuario:", error));
     });
 
     // Actualizar Usuario
@@ -120,9 +139,9 @@ document.addEventListener("DOMContentLoaded", () => {
             tipdoc: document.getElementById("update-user-tipdoc").value,
             numdoc: parseInt(document.getElementById("update-user-numdoc").value),
             usr: document.getElementById("update-user-usr").value,
-            usrpsw: document.getElementById("update-user-usrpsw").value,
+            usrpsw: encodeBase64(document.getElementById("update-user-usrpsw").value),
             grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
-            fchcreation: "0001-01-01T00:00:00", // Asegurando formato de fecha
+            fchcreation: getCurrentDateTimeISO(), // Asegurando formato de fecha
             group: {
                 grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
                 grpdsc: "" // Deja en blanco si no es necesario un valor específico
