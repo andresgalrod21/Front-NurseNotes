@@ -123,6 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
             usrpsw: document.getElementById("update-user-usrpsw").value,
             grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
             fchcreation: "0001-01-01T00:00:00", // Asegurando formato de fecha
+            group: {
+                grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
+                grpdsc: "" // Deja en blanco si no es necesario un valor específico
+            }
         };
 
         console.log("Datos enviados al backend:", userData);
