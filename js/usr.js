@@ -10,39 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const usersSection = document.getElementById("users");
     const usersBtn = document.getElementById("usr-btn");
 
-    // Otras secciones que deben ocultarse al ver la sección Usuarios
-    const diagnosSection = document.getElementById("diagnosticos");
-    const groupsSection = document.getElementById("groups");
-    const foliosSection = document.getElementById("folios");
-    const headquartersSection = document.getElementById("headquarters");
-    const incomesSection = document.getElementById("incomes");
-    const medicationsSection = document.getElementById("medications");
-    const permissionsGroupsSection = document.getElementById("permissions-groups");
-    const permissionsSection = document.getElementById("permissions");
-    const staffSection = document.getElementById("staff");
-    const tipdocsSection = document.getElementById("tipdocs");
-    const logsSection = document.getElementById("logs");
-    const scoreSection = document.getElementById("score");
-
-
     // Función para ocultar todas las secciones
     function hideAllSections() {
-        if (diagnosSection) diagnosSection.style.display = "none";
-        if (groupsSection) groupsSection.style.display = "none";
-        if (foliosSection) foliosSection.style.display = "none";
-        if (headquartersSection) headquartersSection.style.display = "none";
-        if (incomesSection) incomesSection.style.display = "none";
-        if (medicationsSection) medicationsSection.style.display = "none";
-        if (permissionsGroupsSection) permissionsGroupsSection.style.display = "none";
-        if (permissionsSection) permissionsSection.style.display = "none";
-        if (staffSection) staffSection.style.display = "none";
-        if (tipdocsSection) tipdocsSection.style.display = "none";
-        if (logsSection) logsSection.style.display = "none";
-        if (scoreSection) scoreSection.style.display = "none";
-
-
-
-
+        // Ocultar todas las secciones adicionales
         usersSection.style.display = "none";
     }
 
@@ -58,8 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://nursenotes.somee.com/apiUsers")
             .then((response) => response.json())
             .then((data) => {
-                usersTable.innerHTML = ""; 
-                updateUserIDSelect.innerHTML = ""; 
+                usersTable.innerHTML = "";
+                updateUserIDSelect.innerHTML = "";
                 data.forEach((user) => {
                     const row = usersTable.insertRow();
                     row.innerHTML = `
@@ -70,9 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${user.numdoc}</td>
                         <td>${user.usr}</td>
                         <td>${user.grP_ID}</td>
+                        <td>${user.group ? user.group.grpdsc : ''}</td>
                         <td><button onclick="confirmRemoveUserRow(this)">Eliminar</button></td>
                     `;
-
                     const option = document.createElement("option");
                     option.value = user.usR_ID;
                     option.textContent = `${user.usR_ID} - ${user.name} ${user.lastname}`;
@@ -92,17 +62,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // Crear Usuario
     userCreateForm.addEventListener("submit", (e) => {
         e.preventDefault();
+
         const userData = {
+            usR_ID: 0,
             name: document.getElementById("user-name").value,
             lastname: document.getElementById("user-lastname").value,
             tipdoc: document.getElementById("user-tipdoc").value,
             numdoc: parseInt(document.getElementById("user-numdoc").value),
-            usr: document.getElementById("user-usr").value,
             usrpsw: document.getElementById("user-usrpsw").value,
+            usr: document.getElementById("user-usr").value,
+            fchcreation: "0001-01-01T00:00:00", // Fecha de creación en formato default
             grP_ID: parseInt(document.getElementById("user-grp-id").value),
+            group: {
+                grP_ID: 0,
+                grpdsc: ""
+            }
         };
 
-        console.log("Datos enviados al backend:", userData); // Log de los datos enviados
+        console.log("Datos enviados al backend:", userData);
 
         fetch("https://nursenotes.somee.com/apiUsers", {
             method: "POST",
@@ -113,34 +90,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!response.ok) {
                     return response.json().then((errorData) => {
                         console.error("Error en la respuesta del servidor:", errorData);
+                        if (errorData.errors) {
+                            for (const [field, messages] of Object.entries(errorData.errors)) {
+                                console.error(`Error en el campo ${field}: ${messages.join(", ")}`);
+                            }
+                        }
                         throw new Error("Error al crear el usuario");
                     });
                 }
                 return response.json();
             })
             .then((data) => {
-                console.log("Usuario creado con éxito:", data); // Log de éxito
+                console.log("Usuario creado con éxito:", data);
                 loadUsers();
                 userCreateForm.reset();
             })
             .catch((error) => console.error("Error en la creación del usuario:", error));
     });
-    // Buscar Usuario por ID
-    searchUserBtn.addEventListener("click", () => {
-        const usR_ID = document.getElementById("search-user-id").value;
-
-        fetch(`https://nursenotes.somee.com/apiUsers/${usR_ID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                userSearchOutput.innerHTML = data
-                    ? `<p>ID: ${data.usR_ID}, Nombre: ${data.name}, Apellido: ${data.lastname}</p>`
-                    : `<p>No se encontró el usuario con ID: ${usR_ID}</p>`;
-            })
-            .catch((error) => console.error("Error al buscar usuario:", error));
-    });
 
     // Actualizar Usuario
-    updateUserBtn.addEventListener("click", () => {
+    updateUserBtn.addEventListener("click", (e) => {
+        e.preventDefault(); // Evita la recarga de página
+
         const usR_ID = updateUserIDSelect.value;
         const userData = {
             usR_ID: parseInt(usR_ID),
@@ -151,7 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
             usr: document.getElementById("update-user-usr").value,
             usrpsw: document.getElementById("update-user-usrpsw").value,
             grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
+            fchcreation: "0001-01-01T00:00:00", // Asegurando formato de fecha
         };
+
+        console.log("Datos enviados al backend:", userData);
 
         fetch(`https://nursenotes.somee.com/apiUsers/${usR_ID}`, {
             method: "PUT",
@@ -160,12 +134,21 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Error al actualizar el usuario");
+                    return response.json().then((errorData) => {
+                        console.error("Error en la respuesta del servidor:", errorData);
+                        if (errorData.errors) {
+                            // Mostrar errores específicos de validación
+                            for (const [field, messages] of Object.entries(errorData.errors)) {
+                                console.error(`Error en el campo ${field}: ${messages.join(", ")}`);
+                            }
+                        }
+                        throw new Error("Error al actualizar el usuario");
+                    });
                 }
                 return response.json();
             })
             .then(() => {
-                loadUsers();
+                loadUsers(); // Recargar la lista de usuarios
                 updateUserIDSelect.selectedIndex = 0;
                 document.getElementById("update-user-name").value = "";
                 document.getElementById("update-user-lastname").value = "";
