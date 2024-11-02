@@ -10,41 +10,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const usersSection = document.getElementById("users");
     const usersBtn = document.getElementById("usr-btn");
 
-    // Otras secciones que deben ocultarse al ver la sección Usuarios
-    const diagnosSection = document.getElementById("diagnosticos");
-    const groupsSection = document.getElementById("groups");
-    const foliosSection = document.getElementById("folios");
-    const headquartersSection = document.getElementById("headquarters");
-    const incomesSection = document.getElementById("incomes");
-    const medicationsSection = document.getElementById("medications");
-    const permissionsGroupsSection = document.getElementById("permissions-groups");
-    const permissionsSection = document.getElementById("permissions");
-    const staffSection = document.getElementById("staff");
-    const tipdocsSection = document.getElementById("tipdocs");
-    const logsSection = document.getElementById("logs");
-    const scoreSection = document.getElementById("score");
+    // Establecer estilo para scroll en la tabla de usuarios
+    document.getElementById("users-table").style.cssText = `
+        display: block;
+        max-height: 200px; /* Ajusta el tamaño según tu preferencia */
+        overflow-y: scroll;
+        width: 100%;
+    `;
 
-
-    // Función para ocultar todas las secciones
-    function hideAllSections() {
-        if (diagnosSection) diagnosSection.style.display = "none";
-        if (groupsSection) groupsSection.style.display = "none";
-        if (foliosSection) foliosSection.style.display = "none";
-        if (headquartersSection) headquartersSection.style.display = "none";
-        if (incomesSection) incomesSection.style.display = "none";
-        if (medicationsSection) medicationsSection.style.display = "none";
-        if (permissionsGroupsSection) permissionsGroupsSection.style.display = "none";
-        if (permissionsSection) permissionsSection.style.display = "none";
-        if (staffSection) staffSection.style.display = "none";
-        if (tipdocsSection) tipdocsSection.style.display = "none";
-        if (logsSection) logsSection.style.display = "none";
-        if (scoreSection) scoreSection.style.display = "none";
-
-
-
-
-        usersSection.style.display = "none";
+    // Función para codificar en Base64
+    function encodeBase64(str) {
+        return btoa(str);
     }
+
+    // Función para obtener la fecha y hora actual en formato ISO
+    function getCurrentDateTimeISO() {
+        return new Date().toISOString();
+    }
+
+    // Validar contraseña
+    function isPasswordValid(password) {
+        const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        return passwordPattern.test(password);
+    }
+
+      // Función para ocultar todas las secciones
+      function hideAllSections() {
+        const sections = [
+          "diagnosticos",
+        "groups",
+        "headquarters",
+        "incomes",
+        "medications",
+        "permissions-groups",
+        "permissions",
+        "specialities",
+        "staff",
+        "tipdocs",
+        "users",
+        "logs",
+        "score",
+        "patients",
+        "patient-records",
+        "signs",
+        "supplies-patients",
+        "folios",
+        "nurse-note-section"
+        ];
+        sections.forEach((id) => {
+          const section = document.getElementById(id);
+          if (section) section.style.display = "none";
+        });
+      }
+    
 
     // Evento para mostrar solo la sección de usuarios
     usersBtn.addEventListener("click", () => {
@@ -56,10 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Función para cargar Usuarios
     function loadUsers() {
         fetch("https://nursenotes.somee.com/apiUsers")
-            .then((response) => response.json())
-            .then((data) => {
-                usersTable.innerHTML = ""; 
-                updateUserIDSelect.innerHTML = ""; 
+            .then(response => response.json())
+            .then(data => {
+                usersTable.innerHTML = "";
+                updateUserIDSelect.innerHTML = '<option value="">Seleccione un usuario</option>';
                 data.forEach((user) => {
                     const row = usersTable.insertRow();
                     row.innerHTML = `
@@ -70,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${user.numdoc}</td>
                         <td>${user.usr}</td>
                         <td>${user.grP_ID}</td>
+                        <td>${user.group ? user.group.grpdsc : ''}</td>
                         <td><button onclick="confirmRemoveUserRow(this)">Eliminar</button></td>
                     `;
 
@@ -89,17 +108,57 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // Llenar campos de actualización automáticamente al seleccionar un usuario
+    updateUserIDSelect.addEventListener("change", () => {
+        const selectedUserId = updateUserIDSelect.value;
+        if (!selectedUserId) return; // Si no hay selección, salir
+
+        fetch(`https://nursenotes.somee.com/apiUsers/${selectedUserId}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById("update-user-name").value = user.name;
+                document.getElementById("update-user-lastname").value = user.lastname;
+                document.getElementById("update-user-tipdoc").value = user.tipdoc;
+                document.getElementById("update-user-numdoc").value = user.numdoc;
+                document.getElementById("update-user-usr").value = user.usr;
+                document.getElementById("update-user-grp-id").value = user.grP_ID;
+            })
+            .catch(error => console.error("Error al cargar los datos del usuario:", error));
+    });
+
     // Crear Usuario
     userCreateForm.addEventListener("submit", (e) => {
         e.preventDefault();
+
+        const name = document.getElementById("user-name").value;
+        const lastname = document.getElementById("user-lastname").value;
+        const tipdoc = document.getElementById("user-tipdoc").value;
+        const numdoc = parseInt(document.getElementById("user-numdoc").value);
+        const usrpsw = document.getElementById("user-usrpsw").value;
+        const usr = document.getElementById("user-usr").value;
+        const grP_ID = parseInt(document.getElementById("user-grp-id").value);
+        const fchcreation = getCurrentDateTimeISO();
+
+        // Validar contraseña
+        if (!isPasswordValid(usrpsw)) {
+            alert("La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número.");
+            return;
+        }
+
         const userData = {
-            name: document.getElementById("user-name").value,
-            lastname: document.getElementById("user-lastname").value,
-            tipdoc: document.getElementById("user-tipdoc").value,
-            numdoc: parseInt(document.getElementById("user-numdoc").value),
-            usr: document.getElementById("user-usr").value,
-            usrpsw: document.getElementById("user-usrpsw").value,
-            grP_ID: parseInt(document.getElementById("user-grp-id").value),
+            usR_ID: 0,
+            name: name,
+            lastname: lastname,
+            tipdoc: tipdoc,
+            numdoc: numdoc,
+            usrpsw: encodeBase64(usrpsw),
+            usr: usr,
+            fchcreation: fchcreation,
+            grP_ID: grP_ID,
+            group: {
+                grP_ID: 0,
+                grpdsc: ""
+            }
         };
 
         fetch("https://nursenotes.somee.com/apiUsers", {
@@ -107,36 +166,36 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error al crear el usuario");
+                    return response.json().then(errorData => {
+                        console.error("Error en la respuesta del servidor:", errorData);
+                        throw new Error("Error al crear el usuario");
+                    });
                 }
                 return response.json();
             })
-            .then(() => {
+            .then(data => {
+                console.log("Usuario creado con éxito:", data);
                 loadUsers();
                 userCreateForm.reset();
             })
-            .catch((error) => console.error("Error en la creación del usuario:", error));
-    });
-
-    // Buscar Usuario por ID
-    searchUserBtn.addEventListener("click", () => {
-        const usR_ID = document.getElementById("search-user-id").value;
-
-        fetch(`https://nursenotes.somee.com/apiUsers/${usR_ID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                userSearchOutput.innerHTML = data
-                    ? `<p>ID: ${data.usR_ID}, Nombre: ${data.name}, Apellido: ${data.lastname}</p>`
-                    : `<p>No se encontró el usuario con ID: ${usR_ID}</p>`;
-            })
-            .catch((error) => console.error("Error al buscar usuario:", error));
+            .catch(error => console.error("Error en la creación del usuario:", error));
     });
 
     // Actualizar Usuario
-    updateUserBtn.addEventListener("click", () => {
+    updateUserBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
         const usR_ID = updateUserIDSelect.value;
+        const updatePassword = document.getElementById("update-user-usrpsw").value;
+
+        // Validar contraseña en la actualización
+        if (updatePassword && !isPasswordValid(updatePassword)) {
+            alert("La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número.");
+            return;
+        }
+
         const userData = {
             usR_ID: parseInt(usR_ID),
             name: document.getElementById("update-user-name").value,
@@ -144,8 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
             tipdoc: document.getElementById("update-user-tipdoc").value,
             numdoc: parseInt(document.getElementById("update-user-numdoc").value),
             usr: document.getElementById("update-user-usr").value,
-            usrpsw: document.getElementById("update-user-usrpsw").value,
+            usrpsw: encodeBase64(updatePassword),
             grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
+            fchcreation: getCurrentDateTimeISO(),
+            group: {
+                grP_ID: parseInt(document.getElementById("update-user-grp-id").value),
+                grpdsc: ""
+            }
         };
 
         fetch(`https://nursenotes.somee.com/apiUsers/${usR_ID}`, {
@@ -155,7 +219,10 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Error al actualizar el usuario");
+                    return response.json().then((errorData) => {
+                        console.error("Error en la respuesta del servidor:", errorData);
+                        throw new Error("Error al actualizar el usuario");
+                    });
                 }
                 return response.json();
             })

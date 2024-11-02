@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const showMoreBtn = document.getElementById('mnt-btn');
+    const ntBtn = document.getElementById('nt-btn');
     const firstBackButton = document.getElementById('back-button-1');
-    const secondBackButton = document.getElementById('back-button-2');
+    const thirdBackButton = document.getElementById('back-button-3');
 
-    if (showMoreBtn) {
-        showMoreBtn.addEventListener('click', function() {
-            // Mostrar la sección "more-options"
-            const moreOptions = document.getElementById('mantadmin');
+    if (ntBtn) {
+        ntBtn.addEventListener('click', function() {
+            // Mostrar la sección "notasenf"
+            const notasEnfSection = document.getElementById('notasenf');
             const heroContainer = document.querySelector('.hero_container');
             const loginSection = document.getElementById('login-section');
             const actionButtons = document.getElementById('action-buttons');
@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
             loginSection.style.display = 'none';
             actionButtons.style.display = 'none';
             
-            // Mostrar "more-options"
-            moreOptions.style.display = 'block';
+            // Mostrar "notasenf"
+            notasEnfSection.style.display = 'block';
 
-            // Ocultar el primer botón y mostrar el segundo
-            if (firstBackButton && secondBackButton) {
+            // Ocultar el primer botón y mostrar el tercer botón
+            if (firstBackButton && thirdBackButton) {
                 firstBackButton.style.display = 'none';
-                secondBackButton.style.display = 'block';
+                thirdBackButton.style.display = 'block';
             }
         });
     }
