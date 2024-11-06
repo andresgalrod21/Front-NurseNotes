@@ -2,18 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const registerButton = document.getElementById("crea-simple");
     const simpleRegisterSection = document.getElementById("simple-register");
     const simpleRegisterForm = document.getElementById("simple-register-form");
+    const dataAcceptanceSection = document.getElementById("data-acceptance-section");
+    const acceptButton = document.getElementById("accept-data-usage");
+
+    let userData = null; // Variable para almacenar los datos del usuario temporalmente
 
     // Función para ocultar todas las secciones y el botón de registro
     function showSimpleRegisterSection() {
-        // Ocultar todas las secciones de la página
         document.querySelectorAll("section").forEach(section => {
             section.style.display = "none";
         });
 
-        // Ocultar el botón de registro
         registerButton.style.display = "none";
-
-        // Mostrar la sección de registro simplificado
         simpleRegisterSection.style.display = "block";
     }
 
@@ -62,25 +62,35 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const userData = {
+        // Almacenar los datos temporalmente para su uso posterior
+        userData = {
             usR_ID: 0,
             name: name,
             lastname: lastname,
-            tipdoc: "N/A", // Campos predeterminados no incluidos en el formulario simplificado
+            tipdoc: "N/A",
             numdoc: 0,
             usrpsw: password,
             usr: username,
             mail: email,
             fchcreation: new Date().toISOString(),
-            grP_ID: 3, // ID de grupo predeterminado
+            grP_ID: 3,
             group: {
                 grP_ID: 3,
                 grpdsc: ""
             }
         };
 
+        // Mostrar la sección de aceptación de datos
+        simpleRegisterSection.style.display = "none"; // Ocultar formulario de registro
+        dataAcceptanceSection.style.display = "block";
+    });
+
+    // Evento para crear el usuario al aceptar los términos de uso
+    acceptButton.addEventListener("click", () => {
+        dataAcceptanceSection.style.display = "none"; // Ocultar la sección de aceptación
+
         // Llamada a la API para crear el usuario
-        fetch("https://localhost:7299/apiUsers", {
+        fetch("https://nursenotes.somee.com/apiUsers", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -89,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(async response => {
             if (!response.ok) {
-                // Intenta leer la respuesta como texto en lugar de JSON
                 const errorText = await response.text();
                 console.error("Error en la respuesta del servidor:", errorText);
 
@@ -101,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(data => {
             console.log("Usuario creado con éxito:", data);
-            alert("Usuario creado correctamente."); // Mensaje de confirmación
+            alert("Usuario creado correctamente.");
             location.reload(); // Recargar la página
         })
         .catch(error => {

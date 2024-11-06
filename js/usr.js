@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Función para cargar Usuarios
     function loadUsers() {
-        fetch("https://localhost:7299/apiUsers")
+        fetch("https://nursenotes.somee.com/apiUsers")
             .then(response => response.json())
             .then(data => {
                 usersTable.innerHTML = "";
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!validateUserData(userData)) return;
 
-        sendUserData("https://localhost:7299/apiUsers", "POST", userData)
+        sendUserData("https://nursenotes.somee.com/apiUsers", "POST", userData)
             .then((data) => {
                 alert("Usuario creado correctamente.");
                 loadUsers();
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedUserId = updateUserIDSelect.value;
         if (!selectedUserId) return;
 
-        fetch(`https://localhost:7299/apiUsers/${selectedUserId}`)
+        fetch(`https://nursenotes.somee.com/apiUsers/${selectedUserId}`)
             .then(response => response.json())
             .then(user => {
                 document.getElementById("update-user-name").value = user.name;
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!validateUserData(userData)) return;
 
-        sendUserData(`https://localhost:7299/apiUsers/${userData.usR_ID}`, "PUT", userData)
+        sendUserData(`https://nursenotes.somee.com/apiUsers/${userData.usR_ID}`, "PUT", userData)
             .then(() => {
                 alert("Usuario actualizado correctamente.");
                 loadUsers();
